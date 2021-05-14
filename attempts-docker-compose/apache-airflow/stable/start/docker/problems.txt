@@ -1,0 +1,86 @@
+ValueError: Unable to configure handler 'processor': [Errno 13] Permission denied: '/opt/airflow/logs/scheduler'
+
+Steps:
+
+$ mkdir ./dags ./logs ./plugins
+
+$ echo -e "AIRFLOW_UID=$(id -u)\nAIRFLOW_GID=0" > .env
+
+$ docker-compose up airflow-init
+(It fails)
+
+It should be:
+airflow-init_1       | Upgrades done
+airflow-init_1       | Admin user airflow created
+airflow-init_1       | 2.0.2
+start_airflow-init_1 exited with code 0
+
+But it's:
+
+Oops, it works!
+
+$ docker-compose up
+
+:D 
+
+How to solve it? Apparently, we have to prepare the db WITHOUT DAGs, and create themo after the DB :|
+
+The problem appears if you run within the project folder:
+
+Attaching to airflow-dag-4-beginners_airflow-init_1
+airflow-init_1       | ....................
+airflow-init_1       | ERROR! Maximum number of retries (20) reached.
+airflow-init_1       | 
+airflow-init_1       | Last check result:
+airflow-init_1       | $ airflow db check
+airflow-init_1       | Unable to load the config, contains a configuration error.
+airflow-init_1       | Traceback (most recent call last):
+airflow-init_1       |   File "/usr/local/lib/python3.6/pathlib.py", line 1248, in mkdir
+airflow-init_1       |     self._accessor.mkdir(self, mode)
+airflow-init_1       |   File "/usr/local/lib/python3.6/pathlib.py", line 387, in wrapped
+airflow-init_1       |     return strfunc(str(pathobj), *args)
+airflow-init_1       | FileNotFoundError: [Errno 2] No such file or directory: '/opt/airflow/logs/scheduler/2021-05-14'
+airflow-init_1       | 
+airflow-init_1       | During handling of the above exception, another exception occurred:
+airflow-init_1       | 
+airflow-init_1       | Traceback (most recent call last):
+airflow-init_1       |   File "/usr/local/lib/python3.6/logging/config.py", line 565, in configure
+airflow-init_1       |     handler = self.configure_handler(handlers[name])
+airflow-init_1       |   File "/usr/local/lib/python3.6/logging/config.py", line 738, in configure_handler
+airflow-init_1       |     result = factory(**kwargs)
+airflow-init_1       |   File "/home/airflow/.local/lib/python3.6/site-packages/airflow/utils/log/file_processor_handler.py", line 46, in __init__
+airflow-init_1       |     Path(self._get_log_directory()).mkdir(parents=True, exist_ok=True)
+airflow-init_1       |   File "/usr/local/lib/python3.6/pathlib.py", line 1252, in mkdir
+airflow-init_1       |     self.parent.mkdir(parents=True, exist_ok=True)
+airflow-init_1       |   File "/usr/local/lib/python3.6/pathlib.py", line 1248, in mkdir
+airflow-init_1       |     self._accessor.mkdir(self, mode)
+airflow-init_1       |   File "/usr/local/lib/python3.6/pathlib.py", line 387, in wrapped
+airflow-init_1       |     return strfunc(str(pathobj), *args)
+airflow-init_1       | PermissionError: [Errno 13] Permission denied: '/opt/airflow/logs/scheduler'
+airflow-init_1       | 
+airflow-init_1       | During handling of the above exception, another exception occurred:
+airflow-init_1       | 
+airflow-init_1       | Traceback (most recent call last):
+airflow-init_1       |   File "/home/airflow/.local/bin/airflow", line 5, in <module>
+airflow-init_1       |     from airflow.__main__ import main
+airflow-init_1       |   File "/home/airflow/.local/lib/python3.6/site-packages/airflow/__init__.py", line 46, in <module>
+airflow-init_1       |     settings.initialize()
+airflow-init_1       |   File "/home/airflow/.local/lib/python3.6/site-packages/airflow/settings.py", line 434, in initialize
+airflow-init_1       |     LOGGING_CLASS_PATH = configure_logging()
+airflow-init_1       |   File "/home/airflow/.local/lib/python3.6/site-packages/airflow/logging_config.py", line 62, in configure_logging
+airflow-init_1       |     raise e
+airflow-init_1       |   File "/home/airflow/.local/lib/python3.6/site-packages/airflow/logging_config.py", line 57, in configure_logging
+airflow-init_1       |     dictConfig(logging_config)
+airflow-init_1       |   File "/usr/local/lib/python3.6/logging/config.py", line 802, in dictConfig
+airflow-init_1       |     dictConfigClass(config).configure()
+airflow-init_1       |   File "/usr/local/lib/python3.6/logging/config.py", line 573, in configure
+airflow-init_1       |     '%r: %s' % (name, e))
+airflow-init_1       | ValueError: Unable to configure handler 'processor': [Errno 13] Permission denied: '/opt/airflow/logs/scheduler'
+airflow-init_1       | 
+airflow-dag-4-beginners_airflow-init_1 exited with code 1
+
+The problem was the lack of...
+
+$ mkdir ./dags ./logs ./plugins
+
+Airflow created these directories as root.

@@ -72,6 +72,23 @@ ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/user_g
 
  A python file within the dags folder.
 
+## Run the DAG
+
+Run airflow by using Docker.
+
+See https://airflow.apache.org/docs/apache-airflow/stable/start/docker.html for detailed instructions.
+
+Here we provide a docker-compose file from https://github.com/marclamberti/docker-airflow/blob/main/docker-compose.yml.
+
+See https://github.com/marclamberti/docker-airflow/blob/main/README.md.
+
+In linux:
+$ echo -e "AIRFLOW_UID=$(id -u)\nAIRFLOW_GID=0" > .env
+
+$ docker-compose up airflow-init
+
+$ docker-compose up
+
 
 
 
