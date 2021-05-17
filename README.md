@@ -1,6 +1,6 @@
 # Airflow DAG: Coding your first DAG for Beginners 
 
-By following https://www.youtube.com/watch?v=IH1-0hwFZRQ&t=1049s
+By following https://www.youtube.com/watch?v=IH1-0hwFZRQ
 
 ## More links:
 
@@ -89,7 +89,26 @@ $ docker-compose up airflow-init
 
 $ docker-compose up
 
+# Website tutorial
 
+After following:
+* https://airflow.apache.org/docs/apache-airflow/stable/start/docker.html
+* https://airflow.apache.org/docs/apache-airflow/stable/start/local.html
+* https://airflow.readthedocs.io/en/1.10.14/installation.html
+
+Let's try:
+* https://airflow.apache.org/docs/apache-airflow/stable/tutorial.html
+
+Maybe later: 
+* https://airflow.apache.org/docs/apache-airflow/stable/tutorial_taskflow_api.html
+* https://airflow.apache.org/docs/apache-airflow/stable/howto/index.html
+
+
+
+
+
+
+## 
 
 
 

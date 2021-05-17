@@ -6,6 +6,7 @@ __pycache__/
 # Airflow working directories
 logs/dag_processor_manager
 logs/first_dag
+logs/tutorial
 logs/scheduler
 logs/scheduler/latest
 
