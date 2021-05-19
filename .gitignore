@@ -9,4 +9,4 @@ logs/first_dag
 logs/tutorial
 logs/scheduler
 logs/scheduler/latest
-
+logs/forex_data_pipeline

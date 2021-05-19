@@ -103,12 +103,83 @@ Maybe later:
 * https://airflow.apache.org/docs/apache-airflow/stable/tutorial_taskflow_api.html
 * https://airflow.apache.org/docs/apache-airflow/stable/howto/index.html
 
+## Let's code the DAG
+
+Done.
+
+# Udemy Apache Airflow: The Hands-On Guide
+
+## Section 3: the forex data pipeline
+
+### DAG with first task: check if the API is available - HttpSensor
+
+forex_data_pipeline.py
+
+Don't forget to Admin > Connection > new:
+Conn Id: forex_api
+Conn type: HTTP
+Host: https://gist.github.com/
+
+Then
+
+```
+$ docker exec -it [docker airflow worker] /bin/bash
+
+default@5eeb714fe107:/opt/airflow$ airflow tasks list forex_data_pipeline
+
+[2021-05-18 14:59:24,521] {dagbag.py:451} INFO - Filling up the DagBag from /opt/airflow/dags
+is_forex_rates_available
+default@5eeb714fe107:/opt/airflow$ airflow tasks test forex_data_pipeline is_forex_rates_available 2021-01-01
+[2021-05-18 15:00:04,890] {dagbag.py:451} INFO - Filling up the DagBag from /opt/airflow/dags
+[2021-05-18 15:00:04,930] {taskinstance.py:877} INFO - Dependencies all met for <TaskInstance: forex_data_pipeline.is_forex_rates_available 2021-01-01T00:00:00+00:00 [None]>
+[2021-05-18 15:00:04,940] {taskinstance.py:877} INFO - Dependencies all met for <TaskInstance: forex_data_pipeline.is_forex_rates_available 2021-01-01T00:00:00+00:00 [None]>
+[2021-05-18 15:00:04,941] {taskinstance.py:1068} INFO - 
+--------------------------------------------------------------------------------
+[2021-05-18 15:00:04,941] {taskinstance.py:1069} INFO - Starting attempt 1 of 2
+[2021-05-18 15:00:04,942] {taskinstance.py:1070} INFO - 
+--------------------------------------------------------------------------------
+[2021-05-18 15:00:04,945] {taskinstance.py:1089} INFO - Executing <Task(HttpSensor): is_forex_rates_available> on 2021-01-01T00:00:00+00:00
+[2021-05-18 15:00:05,474] {taskinstance.py:1283} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_EMAIL=malsolo.com@gmail.com
+AIRFLOW_CTX_DAG_OWNER=airflow
+AIRFLOW_CTX_DAG_ID=forex_data_pipeline
+AIRFLOW_CTX_TASK_ID=is_forex_rates_available
+AIRFLOW_CTX_EXECUTION_DATE=2021-01-01T00:00:00+00:00
+[2021-05-18 15:00:05,475] {http.py:102} INFO - Poking: marclamberti/f45f872dea4dfd3eaa015a4a1af4b39b
+[2021-05-18 15:00:05,483] {base.py:78} INFO - Using connection to: id: forex_api. Host: https://gist.github.com/, Port: None, Schema: , Login: , Password: None, extra: None
+[2021-05-18 15:00:05,488] {http.py:140} INFO - Sending 'GET' to url: https://gist.github.com/marclamberti/f45f872dea4dfd3eaa015a4a1af4b39b
+[2021-05-18 15:00:05,924] {base.py:245} INFO - Success criteria met. Exiting.
+[2021-05-18 15:00:05,938] {taskinstance.py:1192} INFO - Marking task as SUCCESS. dag_id=forex_data_pipeline, task_id=is_forex_rates_available, execution_date=20210101T000000, start_date=20210518T150004, end_date=20210518T150005
+default@5eeb714fe107:/opt/airflow$ 
+
+```
+
+### DAG second task: check if the currency file is available - FileSensor
+
+First:
+
+Admin > Connections 
+	New
+		Conn Id: forex_path
+		Conn type: File (path)
+		Extra: {"path" : "/opt/airflow/files"}
+
+Again, validate the task
+
+$ docker ps
+
+$ docker exec -it [airflow worker docker id] /bin/bash
+
+default@4d97751e58a4:~$ ls /opt/airflow/files/
+forex_currencies.csv
+
+default@4d97751e58a4:~$ airflow tasks list forex_data_pipeline
+[2021-05-19 09:54:57,761] {dagbag.py:451} INFO - Filling up the DagBag from /opt/airflow/dags
+is_forex_currencies_file_available
+is_forex_rates_available
 
 
-
-
-
-## 
-
-
-
+default@4d97751e58a4:~$ airflow tasks test forex_data_pipeline is_forex_currencies_file_available 2021-01-01
+...
+[2021-05-19 09:57:54,440] {taskinstance.py:1192} INFO - Marking task as SUCCESS. dag_id=forex_data_pipeline, task_id=is_forex_currencies_file_available, execution_date=20210101T000000, start_date=20210519T095754, end_date=20210519T095754
+default@4d97751e58a4:~$ 
